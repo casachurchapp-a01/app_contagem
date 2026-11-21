@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Casa Church">
+<title>Casa Church · Lugares</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#000;--s1:#0d0d0d;--s2:#161616;--s3:#222;--line:#2b2b2b;
+  --txt:#fff;--mut:#9c9c9c;
+  --free:#2fbf71;--occ:#e5484d;--warn:#f5c518;--warn-ink:#141414;--ok:#1f3d2b;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color-scheme:dark;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--txt);font-family:var(--font);font-size:16px;line-height:1.4;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:#000}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.mut{color:var(--mut)}.small{font-size:.85rem}
+
+/* Topo */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:#000;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:10px 14px}
+.brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.brand img{width:42px;height:42px}
+.brand b{font-size:1.25rem;letter-spacing:.02em;font-weight:800;white-space:nowrap}
+.brand b span{font-weight:300}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:5px 10px;font-size:.78rem;white-space:nowrap}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--mut)}
+.pill.live i{background:var(--free);box-shadow:0 0 0 3px rgba(47,191,113,.25)}
+.pill.off i{background:var(--warn)}
+.pill.err i{background:var(--occ)}
+.me{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--s2);font-weight:700;font-size:.85rem}
+
+main{max-width:720px;margin:0 auto;padding:16px 14px 28px}
+.scr{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+.scr>*{min-width:0}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:16px}
+h1,h2,h3{margin:0;line-height:1.15}
+.h1{font-size:1.6rem;font-weight:800}
+.h2{font-size:1.35rem;font-weight:800}
+.h3{font-size:1.05rem;font-weight:700}
+
+/* Formulários */
+.form{display:grid;gap:12px}
+.form label{display:grid;gap:5px;font-size:.88rem;color:var(--mut)}
+.form input{background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:1rem;color:var(--txt);width:100%}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border:1px solid var(--line);background:var(--s2);border-radius:14px;padding:13px 16px;font-weight:700;font-size:.98rem;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.primary{background:#fff;color:#000;border-color:#fff}
+.btn.danger{background:#7f1d1d;border-color:#b91c1c;color:#fff}
+.btn.outline-danger{color:#ff8a8d;border-color:#5a2526}
+.btn:disabled{opacity:.45;cursor:default}
+.btn svg{width:18px;height:18px}
+.wide{width:100%}
+.row-btns,.two-btn{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* Login */
+.center{justify-items:center;text-align:center;padding-top:6vh}
+.logo-xl{width:160px;height:160px}
+.center .card{width:100%;max-width:420px;text-align:left}
+.conn summary{cursor:pointer;font-weight:700;display:flex;justify-content:space-between;gap:8px;list-style:none}
+.conn summary::-webkit-details-marker{display:none}
+.conn[open] summary{margin-bottom:12px}
+
+/* Lista de cultos */
+.list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.list button{width:100%;text-align:left;background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.list .t{flex:1;min-width:0}
+.list .t b{display:block}
+.list .t span{font-size:.85rem;color:var(--mut)}
+.badge{font-size:.75rem;font-weight:700;border-radius:99px;padding:4px 9px;background:var(--s3);color:var(--mut);white-space:nowrap}
+.badge.live{background:rgba(47,191,113,.15);color:var(--free)}
+
+/* Mapa */
+.titlebar{display:flex;align-items:center;gap:10px}
+.back{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--s2);font-size:1.4rem;line-height:1;flex:none}
+.titlebar div{min-width:0}
+.titlebar h2{font-size:1.2rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.banner{display:flex;gap:10px;align-items:center;border-radius:14px;padding:11px 14px;font-size:.92rem;background:var(--ok);color:#d8f5e4}
+.banner b{font-weight:800}
+.banner.warn{background:var(--warn);color:var(--warn-ink)}
+.banner.danger{background:#7f1d1d;color:#fff}
+.banner.info{background:var(--s3);color:var(--txt)}
+.banner svg{width:22px;height:22px;flex:none}
+
+.mapcard{padding:14px 10px}
+.mapwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.map{--seat:14px;--gap:2px;display:grid;grid-template-columns:auto auto auto auto auto;column-gap:4px;row-gap:5px;width:max-content;margin:0 auto;align-items:center}
+.pulpito{grid-column:1/-1;justify-self:center;border:2px solid #fff;border-radius:6px;padding:8px 26px;font-weight:800;font-size:.9rem;letter-spacing:.04em;margin-bottom:6px;position:relative}
+.ala-name{text-align:center;font-weight:800;font-size:.8rem;letter-spacing:.04em;padding-bottom:2px}
+.flab{border:0;background:none;padding:0;width:28px;height:calc(var(--seat) + 4px);font-weight:800;font-size:.78rem;color:#fff;border-radius:6px}
+.flab:hover{background:var(--s3)}
+.ala{display:flex;gap:var(--gap)}
+.corr{grid-column:3;width:24px;align-self:stretch;border-left:2px solid #fff;border-right:2px solid #fff;display:flex;align-items:center;justify-content:center}
+.corr span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:.62rem;font-weight:800;letter-spacing:.12em;white-space:nowrap}
+.seat{width:var(--seat);height:calc(var(--seat) * 1.08);border:0;padding:0;border-radius:3px 3px 2px 2px;background:var(--free);transition:background .12s,transform .08s}
+.seat:active{transform:scale(.85)}
+.seat.o{background:var(--occ)}
+.seat.p{outline:1.5px dashed #fff;outline-offset:1px}
+.ala.new .seat{background:#2b6cb0}
+.map.mini{--seat:8px;--gap:1.5px;row-gap:3px}
+.map.mini .flab{font-size:.6rem;width:22px;height:auto;pointer-events:none}
+.map.mini .seat{background:#3a3a3a}
+.map.mini .seat.o{background:var(--occ)}
+.map.mini .corr{width:14px}
+.map.mini .corr span{font-size:.45rem}
+.map.mini .pulpito{font-size:.7rem;padding:4px 18px}
+.map.mini .ala-name{font-size:.62rem}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;justify-content:center;margin-top:12px;font-size:.85rem}
+.sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.sw.f{background:var(--free)}.sw.o{background:var(--occ)}
+.mapfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+.zoom{display:inline-flex;gap:6px}
+.zoom button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--s2);font-weight:800}
+
+.counters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ct{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center}
+.ct b{display:block;font-size:1.55rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.ct span{font-size:.78rem;color:var(--mut)}
+.ct.o b{color:var(--occ)}.ct.f b{color:var(--free)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions.solo{grid-template-columns:1fr}
+
+/* Edição */
+.editp{display:grid;gap:10px;border-color:#2b6cb0}
+.steprow{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.92rem}
+.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stepper button{width:42px;height:42px;border:0;background:var(--s2);font-size:1.2rem}
+.stepper output{min-width:42px;text-align:center;font-weight:800}
+.edit-sum{margin:0;font-weight:700}
+
+/* Fileira ampliada */
+dialog{border:1px solid var(--line);background:var(--s1);color:var(--txt);padding:0}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+.sheet{margin:auto auto 0;width:100%;max-width:560px;border-radius:20px 20px 0 0;border-bottom:0}
+.sheet-in{padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));display:grid;gap:12px}
+.sheet-head{display:flex;align-items:center;gap:10px}
+.sheet-head h3{flex:1;font-size:1.3rem;font-weight:800}
+.x{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--s2)}
+.rd-lab{font-size:.8rem;font-weight:800;letter-spacing:.04em;margin-bottom:6px;display:flex;justify-content:space-between;color:var(--mut)}
+.rd-seats{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:5px}
+.rd-seats .seat{width:100%;height:auto;aspect-ratio:1/1.08;border-radius:7px 7px 4px 4px;font-size:.8rem;font-weight:800;color:#fff;min-height:30px}
+.rd-nav{display:flex;justify-content:space-between;gap:10px}
+
+/* Relatório */
+.rep-head{display:flex;justify-content:center;padding:6px 0}
+.logo-md{width:130px;height:130px}
+.rep-title{font-size:1.45rem;font-weight:800}
+.stats4{display:grid;grid-template-columns:1fr 1fr;gap:14px 10px;text-align:center}
+.stats4 b{display:block;font-size:2.6rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.stats4 span{color:var(--mut)}
+.pbar{height:10px;border-radius:99px;background:var(--s3);overflow:hidden;grid-column:1/-1}
+.pbar i{display:block;height:100%;background:#fff;border-radius:99px}
+.lines{display:grid;gap:10px;margin-top:10px}
+.line .lt{display:flex;justify-content:space-between;font-weight:700;margin-bottom:5px}
+.bands{display:grid;margin-top:6px}
+.band{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-weight:700}
+.band:last-child{border-bottom:0}
+.band em{font-style:normal;background:var(--s3);border-radius:8px;padding:3px 8px;font-size:.9rem}
+details.rows summary{cursor:pointer;color:var(--mut);margin-top:10px;font-size:.9rem}
+.rowstat{display:grid;grid-template-columns:42px 1fr 70px;align-items:center;gap:10px;font-size:.88rem;padding:4px 0}
+.rowstat .pbar{grid-column:auto;height:7px}
+.rowstat span:last-child{text-align:right;color:var(--mut);font-variant-numeric:tabular-nums}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);background:#fff;color:#000;font-weight:600;padding:11px 16px;border-radius:14px;font-size:.92rem;max-width:calc(100vw - 32px);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:60;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:380px){.counters{grid-template-columns:repeat(2,1fr)}.brand b{font-size:1.05rem}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Impressão / PDF */
+@media print{
+  :root,html,body{background:#fff!important;color:#000!important;padding:0}
+  body::before,.top,.no-print,.toast,dialog{display:none!important}
+  main{padding:0;max-width:none}
+  .card{background:#fff;border-color:#ccc;break-inside:avoid}
+  .mut,.stats4 span,.rowstat span:last-child{color:#555!important}
+  .logo-md{filter:invert(1)}
+  .pbar{background:#e5e5e5}.pbar i{background:#000}
+  .band{border-color:#ddd}.band em{background:#eee}
+  .map.mini .seat{background:#d9d9d9}.map.mini .seat.o{background:var(--occ)}
+  .pulpito,.corr{border-color:#000}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<header class="top no-print" id="top" hidden>
+  <div class="brand"><img src="logo.svg" alt=""><b>CASA <span>CHURCH</span></b></div>
+  <span class="pill" id="sync"><i></i><span>—</span></span>
+  <button class="me" id="meBtn" aria-label="Minha conta"></button>
+</header>
+
+<main>
+
+<!-- LOGIN -->
+<section class="scr center" id="sLogin" hidden>
+  <img src="logo.svg" class="logo-xl" alt="Casa Church Comunidade Cristã">
+  <div>
+    <h1 class="h1">Controle de Lugares</h1>
+    <p class="mut">Entre com seu nome e o PIN da equipe.</p>
+  </div>
+  <form id="fLogin" class="card form" autocomplete="on">
+    <label>Seu nome<input id="lNome" autocomplete="name" required maxlength="40" placeholder="Ex.: Irmão João"></label>
+    <label>PIN<input id="lPin" type="password" inputmode="numeric" autocomplete="current-password" required maxlength="12"></label>
+    <button class="btn primary" type="submit" id="lBtn">Entrar</button>
+  </form>
+  <details class="card conn form" id="connBox">
+    <summary><span>Conexão com a planilha</span><span class="mut small" id="connState"></span></summary>
+    <label>URL do Apps Script (termina em /exec)<input id="cUrl" inputmode="url" placeholder="https://script.google.com/macros/s/…/exec"></label>
+    <div class="row-btns">
+      <button type="button" class="btn" id="cTest">Testar e salvar</button>
+      <button type="button" class="btn" id="cClear">Usar modo local</button>
+    </div>
+    <p class="mut small">Sem planilha, o app funciona só neste aparelho. PINs do modo local: obreiro 1234, líder 4321.</p>
+  </details>
+</section>
+
+<!-- CULTOS -->
+<section class="scr" id="sCultos" hidden>
+  <h2 class="h2">Qual culto vamos servir hoje?</h2>
+  <form id="fCulto" class="card form">
+    <div class="two">
+      <label>Data<input type="date" id="cData" required></label>
+      <label>Horário<input type="time" id="cHora" required></label>
+    </div>
+    <label>Nome do culto<input id="cTitulo" maxlength="60" required></label>
+    <button class="btn primary" type="submit" id="cBtn">Começar culto</button>
+    <p class="mut small" style="margin:0">Se outro obreiro já começou este culto, você entra no mesmo mapa.</p>
+  </form>
+  <h3 class="h3">Cultos recentes</h3>
+  <ul class="list" id="cList"></ul>
+</section>
+
+<!-- MAPA -->
+<section class="scr" id="sMapa" hidden>
+  <div class="titlebar">
+    <button class="back" data-go="cultos" aria-label="Voltar para cultos">‹</button>
+    <div><h2 id="mTitulo"></h2><p class="mut small" style="margin:0" id="mSub"></p></div>
+  </div>
+  <div class="banner" id="banner" role="status"></div>
+
+  <div class="card mapcard">
+    <div class="mapwrap" id="mapWrap"><div class="map" id="map"></div></div>
+    <div class="legend"><span><i class="sw f"></i>Livre</span><span><i class="sw o"></i>Ocupado</span></div>
+    <div class="mapfoot">
+      <span class="mut small">Toque no F da fileira para ampliar</span>
+      <div class="zoom"><button id="zOut" aria-label="Diminuir mapa">−</button><button id="zIn" aria-label="Aumentar mapa">+</button></div>
+    </div>
+  </div>
+
+  <div class="counters">
+    <div class="ct f"><b id="nFree">0</b><span>Livres</span></div>
+    <div class="ct o"><b id="nOcc">0</b><span>Ocupados</span></div>
+    <div class="ct"><b id="nTot">0</b><span>Total</span></div>
+    <div class="ct"><b id="nPct">0%</b><span>Lotação</span></div>
+  </div>
+
+  <div class="card editp" id="editPanel" hidden>
+    <h3 class="h3">Modo Edição</h3>
+    <p class="mut small" style="margin:0">Fileiras novas aparecem em azul. Nada muda para os obreiros até você salvar.</p>
+    <button class="btn wide" id="eAdd">+ Adicionar fileira ao fundo</button>
+    <button class="btn wide outline-danger" id="eRem">Remover última fileira</button>
+    <div class="steprow"><span>Lugares por fileira em cada ala</span>
+      <div class="stepper"><button id="eLm" aria-label="Menos um lugar">−</button><output id="eL"></output><button id="eLp" aria-label="Mais um lugar">+</button></div>
+    </div>
+    <p class="edit-sum" id="eSum"></p>
+    <div class="two-btn"><button class="btn" id="eCancel">Cancelar</button><button class="btn primary" id="eSave">Salvar layout</button></div>
+  </div>
+
+  <div class="actions" id="mActions">
+    <button class="btn" id="bEdit">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Modo Edição</button>
+    <button class="btn primary" id="bRel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>Relatório</button>
+  </div>
+</section>
+
+<!-- RELATÓRIO -->
+<section class="scr" id="sRel" hidden>
+  <div class="titlebar no-print"><button class="back" data-go="mapa" aria-label="Voltar para o mapa">‹</button><div><h2>Relatório</h2></div></div>
+  <div class="rep-head"><img src="logo.svg" class="logo-md" alt="Casa Church"></div>
+  <div>
+    <h2 class="rep-title" id="rTitulo"></h2>
+    <p class="mut" style="margin:4px 0 0" id="rData"></p>
+  </div>
+  <div class="card stats4">
+    <div><b id="rPres">0</b><span>Presentes</span></div>
+    <div><b id="rLiv">0</b><span>Livres</span></div>
+    <div><b id="rTot">0</b><span>Total</span></div>
+    <div><b id="rPct">0%</b><span>Lotação</span></div>
+    <div class="pbar"><i id="rBar"></i></div>
+  </div>
+  <div class="card"><h3 class="h3">Lotação por Ala</h3><div class="lines" id="rAlas"></div></div>
+  <div class="card">
+    <h3 class="h3">Lotação por Fileiras</h3>
+    <div class="bands" id="rBands"></div>
+    <details class="rows" id="rRowsBox"><summary>Ver fileira por fileira</summary><div id="rRows"></div></details>
+  </div>
+  <div class="card"><h3 class="h3" style="margin-bottom:12px">Mapa de Ocupação</h3><div class="mapwrap"><div class="map mini" id="rMap"></div></div></div>
+  <div class="two-btn no-print">
+    <button class="btn" id="bPdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>Exportar PDF</button>
+    <button class="btn primary" id="bWa"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.6 11.6 0 0 0 4.4 3.9c1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>Enviar no WhatsApp</button>
+  </div>
+  <button class="btn danger wide no-print" id="bEncerrar" hidden>Encerrar culto</button>
+</section>
+
+</main>
+
+<dialog class="sheet" id="rowDlg" aria-labelledby="rdT">
+  <div class="sheet-in">
+    <div class="sheet-head"><h3 id="rdT"></h3><button class="x" id="rdClose" aria-label="Fechar">✕</button></div>
+    <p class="mut small" style="margin:-6px 0 0" id="rdSub"></p>
+    <div><div class="rd-lab"><span>ALA OESTE</span><span>corredor ›</span></div><div class="rd-seats" id="rdO"></div></div>
+    <div><div class="rd-lab"><span>‹ corredor</span><span>ALA LESTE</span></div><div class="rd-seats" id="rdL"></div></div>
+    <p class="mut small" style="margin:0">O lugar 1 é sempre o que fica junto ao corredor.</p>
+    <div class="two-btn"><button class="btn" id="rdFree">Liberar fileira</button><button class="btn primary" id="rdFill">Ocupar fileira</button></div>
+    <div class="rd-nav"><button class="btn" id="rdPrev">‹ Anterior</button><button class="btn" id="rdNext">Próxima ›</button></div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================
+   CONFIGURAÇÃO
+   Cole aqui a URL do Apps Script para todos os obreiros já
+   entrarem conectados (sem precisar colar no celular de cada um).
+   ========================================================= */
+const CONFIG = {
+  API_URL: 'https://script.google.com/macros/s/AKfycbysyg_3ALtygVsxbHqfqudNhFRMEvAHMh-O89mw2kmwJQ5lzdZSEMur1rGViTkLqR6j/exec',
+  // No print, o 12º caractere antes do fim podia ser "l" (L minúsculo) ou "I" (i maiúsculo).
+  // O app testa as duas na primeira abertura e guarda a que responder.
+  // Depois de confirmar a certa, pode apagar a linha abaixo.
+  API_URL_ALT: 'https://script.google.com/macros/s/AKfycbysyg_3ALtygVsxbHqfqudNhFRMEvAHMh-O89mw2kmwJQ5IzdZSEMur1rGViTkLqR6j/exec'
+};
+
+(function(){
+'use strict';
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+/* ---------- Armazenamento local ---------- */
+const LS = {
+  get(k,d){ try{ const v=localStorage.getItem('cc_'+k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem('cc_'+k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem('cc_'+k); }catch(e){} }
+};
+const apiUrl = () => (LS.get('apiAuto','') || CONFIG.API_URL || LS.get('apiUrl','')).trim();
+
+/* Descobre qual das URLs configuradas responde (só roda uma vez por aparelho) */
+async function autoDetect(){
+  if(!CONFIG.API_URL || !CONFIG.API_URL_ALT || LS.get('apiAuto','')) return;
+  for(const u of [CONFIG.API_URL, CONFIG.API_URL_ALT]){
+    try{
+      const r = await fetchT(u+'?action=ping&_='+Date.now(), {}, 10000);
+      const j = await r.json();
+      if(j && j.ok){ LS.set('apiAuto', u); return; }
+    }catch(e){}
+  }
+}
+
+class ApiError extends Error {}
+
+/* ---------- Backend: Planilha Google ---------- */
+async function fetchT(url, opts, ms){
+  const ctl = new AbortController(); const t = setTimeout(()=>ctl.abort(), ms);
+  try{ return await fetch(url, Object.assign({}, opts, { signal: ctl.signal, redirect:'follow' })); }
+  finally{ clearTimeout(t); }
+}
+const Remote = {
+  async get(params){
+    const u = new URL(apiUrl());
+    Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));
+    u.searchParams.set('_', Date.now());
+    const r = await fetchT(u.toString(), {}, 15000);
+    const j = await r.json();
+    if(!j.ok) throw new ApiError(j.error || 'Erro na planilha.');
+    return j;
+  },
+  async post(body){
+    const r = await fetchT(apiUrl(), { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(body) }, 20000);
+    const j = await r.json();
+    if(!j.ok) throw new ApiError(j.error || 'Erro na planilha.');
+    return j;
+  },
+  ping(){ return this.get({action:'ping'}); },
+  login(nome,pin){ return this.post({action:'login', nome, pin}); },
+  cultos(){ return this.get({action:'cultos'}); },
+  state(id){ return this.get({action:'state', culto:id}); },
+  criarCulto(c){ return this.post(Object.assign({action:'criarCulto'}, cred(), c)); },
+  mark(id,ops){ return this.post(Object.assign({action:'mark', culto:id, ops}, cred())); },
+  saveLayout(l){ return this.post(Object.assign({action:'saveLayout'}, cred(), l)); },
+  encerrar(id,reabrir){ return this.post(Object.assign({action:'encerrar', culto:id, reabrir:!!reabrir}, cred())); }
+};
+function cred(){ return { nome: S.user ? S.user.nome : '', pin: S.user ? S.user.pin : '' }; }
+
+/* ---------- Backend: modo local (sem internet, só este aparelho) ---------- */
+const Local = {
+  db(){ return LS.get('localdb', { config:{ igreja:'Casa Church', fileiras:14, lugares:11, pinObreiro:'1234', pinLider:'4321', layoutVersao:1 }, cultos:{} }); },
+  put(d){ LS.set('localdb', d); },
+  lay(c){ return { igreja:c.igreja, fileiras:+c.fileiras, lugares:+c.lugares, versao:+c.layoutVersao, intervalo:3 }; },
+  out(d,id){
+    const c = d.cultos[id]; if(!c) throw new ApiError('Culto não encontrado.');
+    return { ok:true, culto:{ id:c.id, data:c.data, hora:c.hora, titulo:c.titulo, status:c.status }, occ:c.occ.slice(), versao:c.versao, layout:this.lay(d.config) };
+  },
+  role(pin){ const c=this.db().config; return pin===c.pinLider?'lider':pin===c.pinObreiro?'obreiro':null; },
+  async ping(){ return { ok:true }; },
+  async login(nome,pin){ const r=this.role(pin); if(!r) throw new ApiError('PIN incorreto.'); return { ok:true, role:r, layout:this.lay(this.db().config) }; },
+  async cultos(){
+    const d=this.db(), L=this.lay(d.config), tot=2*L.fileiras*L.lugares;
+    const list = Object.values(d.cultos).sort((a,b)=>a.id<b.id?1:-1).slice(0,20)
+      .map(c=>({ id:c.id, data:c.data, hora:c.hora, titulo:c.titulo, status:c.status, presentes:c.occ.filter(s=>inside(s,L)).length, total:tot }));
+    return { ok:true, cultos:list };
+  },
+  async state(id){ return this.out(this.db(), id); },
+  async criarCulto(p){
+    const d=this.db(), id=p.data+'_'+p.hora.replace(':','');
+    if(!d.cultos[id]){ d.cultos[id]={ id, data:p.data, hora:p.hora, titulo:p.titulo, status:'Ao vivo', occ:[], versao:1 }; this.put(d); }
+    return this.out(d,id);
+  },
+  async mark(id,ops){
+    const d=this.db(), c=d.cultos[id]; if(!c) throw new ApiError('Culto não encontrado.');
+    if(c.status==='Encerrado') throw new ApiError('Este culto já foi encerrado.');
+    const set=new Set(c.occ); ops.forEach(o=>o.v?set.add(o.s):set.delete(o.s));
+    c.occ=[...set]; c.versao++; this.put(d); return this.out(d,id);
+  },
+  async saveLayout(l){
+    if(this.role(S.user.pin)!=='lider') throw new ApiError('Só o líder pode fazer isso.');
+    const d=this.db(); d.config.fileiras=l.fileiras; d.config.lugares=l.lugares; d.config.layoutVersao++; this.put(d);
+    return { ok:true, layout:this.lay(d.config) };
+  },
+  async encerrar(id,reabrir){
+    if(this.role(S.user.pin)!=='lider') throw new ApiError('Só o líder pode fazer isso.');
+    const d=this.db(), c=d.cultos[id]; c.status=reabrir?'Ao vivo':'Encerrado'; c.versao++; this.put(d); return this.out(d,id);
+  }
+};
+const api = () => apiUrl() ? Remote : Local;
+const isLocal = () => !apiUrl();
+
+/* ---------- Estado do app ---------- */
+const S = {
+  user: LS.get('user', null),
+  layout: LS.get('layout', { igreja:'Casa Church', fileiras:14, lugares:11, versao:0, intervalo:3 }),
+  culto: null,
+  occ: new Set(),
+  versao: 0,
+  pending: new Map(),
+  online: true,
+  flushing: false,
+  editing: false,
+  draft: null,
+  zoom: LS.get('zoom', 1),
+  rowOpen: 0,
+  screen: ''
+};
+let seatEls = new Map();
+
+/* ---------- Utilidades ---------- */
+const sid = (a,r,s) => a+'-'+r+'-'+s;
+function inside(id,L){ const p=id.split('-'); return +p[1]<=L.fileiras && +p[2]<=L.lugares; }
+function isOcc(id){ return S.pending.has(id) ? S.pending.get(id) : S.occ.has(id); }
+const fmtPct = x => (x*100).toLocaleString('pt-BR',{ maximumFractionDigits:1 })+'%';
+const ALA = { O:'Oeste', L:'Leste' };
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtData(d,h){
+  const dt = new Date(d+'T'+(h||'12:00'));
+  if(isNaN(dt)) return d+' '+(h||'');
+  const s = dt.toLocaleDateString('pt-BR',{ weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  return s.charAt(0).toUpperCase()+s.slice(1)+(h?' · '+h:'');
+}
+let toastT;
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'), 2800); }
+function vib(){ try{ navigator.vibrate && navigator.vibrate(8); }catch(e){} }
+
+/* ---------- Navegação ---------- */
+function show(name){
+  S.screen = name;
+  ['Login','Cultos','Mapa','Rel'].forEach(n=>$('#s'+n).hidden = (n.toLowerCase()!==name));
+  $('#top').hidden = name==='login';
+  window.scrollTo(0,0);
+  if(name==='mapa'){ requestAnimationFrame(fitMap); keepAwake(true); } else keepAwake(false);
+  if(name==='rel') renderReport();
+  if(name==='cultos') loadCultos();
+}
+$$('[data-go]').forEach(b=>b.addEventListener('click',()=>{
+  const g=b.dataset.go;
+  if(g==='cultos'){ if(S.editing) cancelEdit(); LS.del('cultoId'); S.culto=null; }
+  show(g);
+}));
+
+/* Tela sempre acesa durante o culto */
+let wakeLock=null;
+async function keepAwake(on){
+  try{
+    if(on && 'wakeLock' in navigator && !wakeLock){ wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release',()=>wakeLock=null); }
+    if(!on && wakeLock){ await wakeLock.release(); wakeLock=null; }
+  }catch(e){}
+}
+
+/* ---------- Indicador de sincronização ---------- */
+function setSync(){
+  const el=$('#sync'), txt=el.querySelector('span');
+  el.className='pill';
+  if(isLocal()){ txt.textContent='Modo local'; return; }
+  const n=S.pending.size;
+  if(!S.online){ el.classList.add('off'); txt.textContent = n ? `Offline · ${n} na fila` : 'Offline'; }
+  else if(n){ el.classList.add('live'); txt.textContent='Enviando…'; }
+  else { el.classList.add('live'); txt.textContent='Ao vivo'; }
+}
+function setOnline(v){ if(S.online!==v){ S.online=v; if(v) toast('Conexão de volta. Sincronizando.'); } setSync(); }
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+function connLabel(){ $('#connState').textContent = apiUrl() ? 'Planilha conectada' : 'Modo local'; }
+if(CONFIG.API_URL) $('#connBox').hidden = true;
+$('#cUrl').value = LS.get('apiUrl','');
+connLabel();
+
+$('#cTest').addEventListener('click', async ()=>{
+  const url=$('#cUrl').value.trim();
+  if(!/^https:\/\/script\.google\.com\/.+\/exec/.test(url)){ toast('A URL precisa ser do Apps Script e terminar em /exec.'); return; }
+  const old=LS.get('apiUrl',''); LS.set('apiUrl',url);
+  try{ await Remote.ping(); connLabel(); toast('Planilha conectada! Agora é só entrar.'); }
+  catch(e){ LS.set('apiUrl',old); connLabel(); toast(e instanceof ApiError ? e.message : 'Não consegui falar com a planilha. Confira a URL e a implantação.'); }
+});
+$('#cClear').addEventListener('click', ()=>{ LS.del('apiUrl'); $('#cUrl').value=''; connLabel(); toast('Modo local ativado. Nada sai deste aparelho.'); });
+
+$('#lNome').value = LS.get('lastName','');
+$('#fLogin').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const nome=$('#lNome').value.trim(), pin=$('#lPin').value.trim();
+  const b=$('#lBtn'); b.disabled=true; b.textContent='Entrando…';
+  try{
+    const r = await api().login(nome,pin);
+    S.user = { nome, pin, role:r.role };
+    LS.set('user', S.user); LS.set('lastName', nome);
+    setLayout(r.layout);
+    $('#lPin').value='';
+    toast(r.role==='lider' ? `Bem-vindo, líder ${nome}! O salão está em suas mãos.` : `Bora servir, ${nome}!`);
+    afterLogin();
+  }catch(err){
+    toast(err instanceof ApiError ? err.message : 'Sem conexão com a planilha. Tente de novo ou use o modo local.');
+  }finally{ b.disabled=false; b.textContent='Entrar'; }
+});
+
+function afterLogin(){
+  $('#meBtn').textContent = S.user.nome.split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase();
+  $('#bEdit').hidden = S.user.role!=='lider';
+  $('#mActions').classList.toggle('solo', S.user.role!=='lider');
+  setSync();
+  const last = LS.get('cultoId', null);
+  if(last) openCulto(last); else show('cultos');
+}
+
+$('#meBtn').addEventListener('click', ()=>{
+  const papel = S.user.role==='lider'?'líder':'obreiro';
+  if(!confirm(`${S.user.nome} (${papel})\n\nSair da conta neste aparelho?`)) return;
+  if(S.pending.size && !confirm('Ainda tem marcações esperando internet. Se sair agora, elas se perdem. Sair mesmo assim?')) return;
+  S.user=null; S.culto=null; S.pending.clear(); LS.del('user'); LS.del('cultoId');
+  show('login');
+});
+
+/* =========================================================
+   CULTOS
+   ========================================================= */
+const pad = n => String(n).padStart(2,'0');
+function initCultoForm(){
+  const d=new Date();
+  $('#cData').value = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  $('#cHora').value = d.getDay()===0 ? (d.getHours()<14 ? '10:00' : '19:00') : '19:30';
+  autoTitle();
+}
+let titleTouched=false;
+function autoTitle(){
+  if(titleTouched) return;
+  const dt=new Date($('#cData').value+'T12:00');
+  const dia = isNaN(dt) ? '' : dt.toLocaleDateString('pt-BR',{ weekday:'long' }).replace('-feira','');
+  const h=$('#cHora').value; const [hh,mm]=h.split(':');
+  $('#cTitulo').value = 'Culto ' + dia.charAt(0).toUpperCase()+dia.slice(1) + ' ' + (hh ? (+hh)+'h'+(mm!=='00'?mm:'') : '');
+}
+$('#cData').addEventListener('change', autoTitle);
+$('#cHora').addEventListener('change', autoTitle);
+$('#cTitulo').addEventListener('input', ()=>titleTouched=true);
+
+$('#fCulto').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const b=$('#cBtn'); b.disabled=true; b.textContent='Abrindo…';
+  try{
+    const r = await api().criarCulto({ data:$('#cData').value, hora:$('#cHora').value, titulo:$('#cTitulo').value.trim() });
+    titleTouched=false;
+    enterCulto(r);
+  }catch(err){
+    toast(err instanceof ApiError ? err.message : 'Sem internet pra criar o culto. Conecte e tente de novo.');
+  }finally{ b.disabled=false; b.textContent='Começar culto'; }
+});
+
+async function loadCultos(){
+  initCultoForm();
+  const ul=$('#cList');
+  const render = list => {
+    ul.innerHTML = list.length ? list.map(c=>`
+      <li><button data-id="${esc(c.id)}">
+        <div class="t"><b>${esc(c.titulo)}</b><span>${esc(fmtData(c.data,c.hora))} · ${c.presentes}/${c.total} presentes</span></div>
+        <span class="badge ${c.status==='Encerrado'?'':'live'}">${esc(c.status)}</span>
+      </button></li>`).join('')
+      : '<li class="mut small">Nenhum culto ainda. O primeiro a gente nunca esquece.</li>';
+  };
+  render(LS.get('cultosCache', []));
+  try{ const r=await api().cultos(); LS.set('cultosCache', r.cultos); render(r.cultos); setOnline(true); }
+  catch(err){ if(!(err instanceof ApiError)) setOnline(false); else toast(err.message); }
+}
+$('#cList').addEventListener('click', e=>{ const b=e.target.closest('button[data-id]'); if(b) openCulto(b.dataset.id); });
+
+/* =========================================================
+   CULTO: estado, marcação e sincronização
+   ========================================================= */
+function setLayout(L){
+  if(!L) return;
+  const changed = !S.layout || L.fileiras!==S.layout.fileiras || L.lugares!==S.layout.lugares;
+  S.layout = L; LS.set('layout', L);
+  if(changed && !S.editing && S.screen==='mapa') buildMainMap();
+}
+
+function applyServer(r){
+  if(!S.culto || r.culto.id!==S.culto.id) return;
+  if(r.versao < S.versao) return;
+  S.culto = r.culto; S.occ = new Set(r.occ); S.versao = r.versao;
+  LS.set('st_'+r.culto.id, { culto:r.culto, occ:r.occ, versao:r.versao });
+  setLayout(r.layout);
+  refresh();
+}
+
+function enterCulto(r){
+  S.culto = r.culto; S.versao = 0;
+  S.pending = new Map(LS.get('pend_'+r.culto.id, []));
+  LS.set('cultoId', r.culto.id);
+  show('mapa');
+  buildMainMap();
+  applyServer(r);
+  if(S.pending.size) flush();
+}
+
+async function openCulto(id){
+  const cached = LS.get('st_'+id, null);
+  if(cached){ enterCulto(Object.assign({ layout:S.layout }, cached)); }
+  try{ const r=await api().state(id); if(!cached) enterCulto(r); else applyServer(r); setOnline(true); }
+  catch(err){
+    if(err instanceof ApiError){ toast(err.message); LS.del('cultoId'); show('cultos'); }
+    else { setOnline(false); if(!cached){ toast('Sem internet e sem cópia deste culto no aparelho.'); show('cultos'); } }
+  }
+}
+
+function savePending(){ if(S.culto) LS.set('pend_'+S.culto.id, [...S.pending]); setSync(); }
+
+function setSeats(ids, v){
+  if(!S.culto) return;
+  if(S.culto.status==='Encerrado'){ toast('Culto encerrado. O mapa agora é só pra consulta.'); return; }
+  ids.forEach(id=>{ if(S.occ.has(id)===v) S.pending.delete(id); else S.pending.set(id, v); });
+  vib(); savePending(); refresh(); scheduleFlush();
+}
+function toggle(id){ setSeats([id], !isOcc(id)); }
+
+let flushT;
+function scheduleFlush(){ clearTimeout(flushT); flushT=setTimeout(flush, 350); }
+async function flush(){
+  if(S.flushing || !S.pending.size || !S.culto) return;
+  S.flushing = true;
+  const id = S.culto.id;
+  const ops = [...S.pending].map(([s,v])=>({ s, v }));
+  try{
+    const r = await api().mark(id, ops);
+    ops.forEach(o=>{ if(S.pending.get(o.s)===o.v) S.pending.delete(o.s); });
+    savePending();
+    setOnline(true);
+    applyServer(r);
+  }catch(err){
+    if(err instanceof ApiError){
+      toast(err.message);
+      ops.forEach(o=>S.pending.delete(o.s)); savePending(); refresh();
+    } else setOnline(false);
+  }finally{
+    S.flushing=false;
+    if(S.pending.size) setTimeout(flush, S.online ? 400 : 5000);
+  }
+}
+
+/* Atualização em tempo real (consulta a planilha a cada X segundos) */
+let lastPoll=0;
+setInterval(async ()=>{
+  if(!S.culto || isLocal() || S.flushing || document.hidden) return;
+  if(S.screen!=='mapa' && S.screen!=='rel') return;
+  const every = (S.layout.intervalo||3)*1000;
+  if(Date.now()-lastPoll < every) return;
+  lastPoll = Date.now();
+  try{ const r=await Remote.state(S.culto.id); setOnline(true); applyServer(r); if(S.pending.size) flush(); }
+  catch(err){ if(!(err instanceof ApiError)) setOnline(false); }
+}, 1000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden){ lastPoll=0; if(S.screen==='mapa') keepAwake(true); } });
+window.addEventListener('online', ()=>{ lastPoll=0; flush(); });
+
+/* Sincroniza abas no modo local */
+window.addEventListener('storage', e=>{
+  if(isLocal() && S.culto && e.key==='cc_localdb'){ Local.state(S.culto.id).then(applyServer).catch(()=>{}); }
+});
+
+/* =========================================================
+   MAPA
+   ========================================================= */
+function mapHTML(L, opts){
+  opts = opts || {};
+  const tag = opts.mini ? 'span' : 'button';
+  const F=L.fileiras, n=L.lugares;
+  let h = '<div class="pulpito">PÚLPITO</div>';
+  h += '<div></div><div class="ala-name">ALA OESTE</div><div></div><div class="ala-name">ALA LESTE</div><div></div>';
+  for(let r=1;r<=F;r++){
+    const nw = opts.newFrom && r>opts.newFrom ? ' new' : '';
+    const lab = `<${tag} class="flab" ${opts.mini?'':`data-r="${r}" aria-label="Ampliar fileira ${r}"`}>F${r}</${tag}>`;
+    h += lab + `<div class="ala${nw}">`;
+    for(let s=n;s>=1;s--) h += `<${tag} class="seat" data-id="O-${r}-${s}" ${opts.mini?'':`aria-label="Ala Oeste F${r} lugar ${s}"`}></${tag}>`;
+    h += '</div>';
+    if(r===1) h += `<div class="corr" style="grid-row:3 / span ${F}"><span>CORREDOR CENTRAL</span></div>`;
+    h += `<div class="ala${nw}">`;
+    for(let s=1;s<=n;s++) h += `<${tag} class="seat" data-id="L-${r}-${s}" ${opts.mini?'':`aria-label="Ala Leste F${r} lugar ${s}"`}></${tag}>`;
+    h += '</div>' + lab;
+  }
+  return h;
+}
+
+function viewLayout(){ return S.editing ? S.draft : S.layout; }
+
+function buildMainMap(){
+  const L = viewLayout();
+  $('#map').innerHTML = mapHTML(L, { newFrom: S.editing ? S.layout.fileiras : 0 });
+  seatEls = new Map();
+  $('#map').querySelectorAll('.seat').forEach(el=>seatEls.set(el.dataset.id, el));
+  fitMap(); refresh();
+}
+
+function fitMap(){
+  const wrap=$('#mapWrap'); if(!wrap.clientWidth) return;
+  const n=viewLayout().lugares;
+  const fixed = 2*28 + 24 + 4*4 + 2*(n-1)*2;
+  let seat = Math.floor((wrap.clientWidth - fixed) / (2*n));
+  seat = Math.max(9, Math.min(28, seat));
+  seat = Math.round(seat * S.zoom);
+  $('#map').style.setProperty('--seat', seat+'px');
+}
+window.addEventListener('resize', fitMap);
+$('#zIn').addEventListener('click', ()=>{ S.zoom=Math.min(2.6, +(S.zoom+0.4).toFixed(1)); LS.set('zoom',S.zoom); fitMap(); });
+$('#zOut').addEventListener('click', ()=>{ S.zoom=Math.max(1, +(S.zoom-0.4).toFixed(1)); LS.set('zoom',S.zoom); fitMap(); });
+
+$('#map').addEventListener('click', e=>{
+  if(S.editing){ toast('Você está no Modo Edição. Salve ou cancele pra marcar lugares.'); return; }
+  const seat=e.target.closest('.seat'); if(seat){ toggle(seat.dataset.id); return; }
+  const f=e.target.closest('.flab'); if(f) openRow(+f.dataset.r);
+});
+
+function stats(L){
+  const F=L.fileiras, n=L.lugares;
+  const rows=[], alas={O:0,L:0}; let occ=0;
+  for(let r=1;r<=F;r++){
+    const row={O:0,L:0};
+    for(const a of ['O','L']) for(let s=1;s<=n;s++) if(isOcc(sid(a,r,s))){ row[a]++; alas[a]++; occ++; }
+    rows.push(row);
+  }
+  const total=2*F*n;
+  return { total, occ, free:total-occ, pct: total?occ/total:0, alas, rows, perAla:F*n, perRow:2*n, n };
+}
+
+function refresh(){
+  if(!S.culto) return;
+  const L=viewLayout();
+  seatEls.forEach((el,id)=>{
+    el.className = 'seat' + (isOcc(id)?' o':'') + (S.pending.has(id)?' p':'');
+  });
+  const st=stats(L);
+  $('#mTitulo').textContent = S.culto.titulo;
+  $('#mSub').textContent = fmtData(S.culto.data, S.culto.hora);
+  $('#nFree').textContent=st.free; $('#nOcc').textContent=st.occ; $('#nTot').textContent=st.total; $('#nPct').textContent=fmtPct(st.pct);
+  renderBanner(st, L);
+  if(S.editing) renderEditSum();
+  if(S.rowOpen) renderRow();
+  if(S.screen==='rel') renderReport();
+  setSync();
+}
+
+const ICON_WARN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
+function renderBanner(st, L){
+  const b=$('#banner');
+  if(S.editing){ b.className='banner info'; b.innerHTML='<span><b>Modo Edição</b> · Mudanças só valem depois de salvar.</span>'; return; }
+  if(S.culto.status==='Encerrado'){ b.className='banner info'; b.innerHTML='<span><b>Culto encerrado</b> · Mapa só para consulta.</span>'; return; }
+  if(st.free===0){ b.className='banner danger'; b.innerHTML=ICON_WARN+'<span><b>Templo lotado!</b> Hora de buscar as cadeiras extras.</span>'; return; }
+  const freeO=st.perAla-st.alas.O, freeL=st.perAla-st.alas.L;
+  const a = freeO>=freeL ? 'O' : 'L';
+  const rows=[];
+  for(let r=1;r<=L.fileiras && rows.length<3;r++){ const f=L.lugares-st.rows[r-1][a]; if(f>0) rows.push(`F${r} (${f})`); }
+  const dir = `Direcionar para Ala ${ALA[a]}: ${rows.join(', ')}`;
+  if(st.pct>=.9){ b.className='banner danger'; b.innerHTML=`${ICON_WARN}<span><b>Quase lotado: ${fmtPct(st.pct)}</b> · ${dir}</span>`; }
+  else if(st.pct>=.6){ b.className='banner warn'; b.innerHTML=`${ICON_WARN}<span><b>Atenção: lotação ${fmtPct(st.pct)}</b> · ${dir}</span>`; }
+  else { b.className='banner'; b.innerHTML=`<span><b>Lotação ${fmtPct(st.pct)}</b> · ${dir}</span>`; }
+}
+
+/* ---------- Fileira ampliada ---------- */
+const dlg=$('#rowDlg');
+function openRow(r){ S.rowOpen=r; renderRow(); if(!dlg.open) dlg.showModal(); }
+function closeRow(){ S.rowOpen=0; if(dlg.open) dlg.close(); }
+dlg.addEventListener('close', ()=>S.rowOpen=0);
+dlg.addEventListener('click', e=>{ if(e.target===dlg) closeRow(); });
+$('#rdClose').addEventListener('click', closeRow);
+function rowIds(r){ const ids=[]; for(const a of ['O','L']) for(let s=1;s<=S.layout.lugares;s++) ids.push(sid(a,r,s)); return ids; }
+function renderRow(){
+  const r=S.rowOpen, n=S.layout.lugares;
+  if(r>S.layout.fileiras){ closeRow(); return; }
+  const ids=rowIds(r), occ=ids.filter(isOcc).length;
+  $('#rdT').textContent = 'Fileira F'+r;
+  $('#rdSub').textContent = `${ids.length-occ} livres · ${occ} ocupados`;
+  const seatB = (a,s) => { const id=sid(a,r,s); return `<button class="seat${isOcc(id)?' o':''}${S.pending.has(id)?' p':''}" data-id="${id}" aria-label="Ala ${ALA[a]} lugar ${s}">${s}</button>`; };
+  let o='', l='';
+  for(let s=n;s>=1;s--) o+=seatB('O',s);
+  for(let s=1;s<=n;s++) l+=seatB('L',s);
+  $('#rdO').style.setProperty('--n',n); $('#rdL').style.setProperty('--n',n);
+  $('#rdO').innerHTML=o; $('#rdL').innerHTML=l;
+  $('#rdPrev').disabled = r<=1; $('#rdNext').disabled = r>=S.layout.fileiras;
+}
+['#rdO','#rdL'].forEach(id=>$(id).addEventListener('click', e=>{ const s=e.target.closest('.seat'); if(s) toggle(s.dataset.id); }));
+$('#rdFill').addEventListener('click', ()=>{ const ids=rowIds(S.rowOpen).filter(id=>!isOcc(id)); if(!ids.length){ toast('Essa fileira já está cheia.'); return; } setSeats(ids,true); toast(`F${S.rowOpen} lotada. Chegou a caravana!`); });
+$('#rdFree').addEventListener('click', ()=>{
+  const ids=rowIds(S.rowOpen).filter(isOcc);
+  if(!ids.length){ toast('Essa fileira já está vazia.'); return; }
+  if(!confirm(`Liberar os ${ids.length} lugares ocupados da F${S.rowOpen}?`)) return;
+  setSeats(ids,false);
+});
+$('#rdPrev').addEventListener('click', ()=>{ if(S.rowOpen>1){ S.rowOpen--; renderRow(); } });
+$('#rdNext').addEventListener('click', ()=>{ if(S.rowOpen<S.layout.fileiras){ S.rowOpen++; renderRow(); } });
+
+/* =========================================================
+   MODO EDIÇÃO (só líder)
+   ========================================================= */
+$('#bEdit').addEventListener('click', ()=>{
+  if(S.user.role!=='lider') return;
+  S.editing=true; S.draft={ fileiras:S.layout.fileiras, lugares:S.layout.lugares };
+  $('#editPanel').hidden=false; $('#mActions').hidden=true;
+  buildMainMap();
+  $('#editPanel').scrollIntoView({ behavior:'smooth', block:'nearest' });
+});
+function cancelEdit(){ S.editing=false; S.draft=null; $('#editPanel').hidden=true; $('#mActions').hidden=false; buildMainMap(); }
+$('#eCancel').addEventListener('click', cancelEdit);
+$('#eAdd').addEventListener('click', ()=>{ if(S.draft.fileiras>=60){ toast('60 fileiras é o limite. Hora de pensar num templo novo!'); return; } S.draft.fileiras++; buildMainMap(); toast(`F${S.draft.fileiras} adicionada ao fundo.`); });
+$('#eRem').addEventListener('click', ()=>{
+  if(S.draft.fileiras<=1){ toast('Sem fileira nenhuma o culto vira em pé.'); return; }
+  const r=S.draft.fileiras;
+  const busy = rowIds(r).filter(isOcc).length;
+  if(r<=S.layout.fileiras && busy && !confirm(`A F${r} tem ${busy} pessoas marcadas neste culto. Remover mesmo assim?`)) return;
+  S.draft.fileiras--; buildMainMap();
+});
+$('#eLm').addEventListener('click', ()=>{ if(S.draft.lugares>1){ S.draft.lugares--; buildMainMap(); } });
+$('#eLp').addEventListener('click', ()=>{ if(S.draft.lugares<30){ S.draft.lugares++; buildMainMap(); } else toast('30 lugares por ala é o limite.'); });
+function renderEditSum(){
+  const d=S.draft, t=2*d.fileiras*d.lugares, old=2*S.layout.fileiras*S.layout.lugares;
+  $('#eL').textContent=d.lugares;
+  const diff=t-old;
+  $('#eSum').textContent = `F1 a F${d.fileiras} · ${d.lugares*2} por fileira · Total: ${t} lugares` + (diff ? ` (${diff>0?'+':''}${diff})` : '');
+}
+$('#eSave').addEventListener('click', async ()=>{
+  const b=$('#eSave'); b.disabled=true; b.textContent='Salvando…';
+  try{
+    const r = await api().saveLayout(S.draft);
+    S.editing=false; S.draft=null; $('#editPanel').hidden=true; $('#mActions').hidden=false;
+    S.layout=r.layout; LS.set('layout', r.layout);
+    buildMainMap();
+    toast('Layout salvo e enviado para todos os obreiros.');
+  }catch(err){ toast(err instanceof ApiError ? err.message : 'Sem internet. O layout precisa de conexão pra salvar.'); }
+  finally{ b.disabled=false; b.textContent='Salvar layout'; }
+});
+
+/* =========================================================
+   RELATÓRIO
+   ========================================================= */
+$('#bRel').addEventListener('click', ()=>show('rel'));
+function bands(st, L){
+  const F=L.fileiras, size=Math.ceil(F/3), out=[];
+  for(let i=0;i<F;i+=size){
+    const a=i+1, z=Math.min(F,i+size);
+    let o=0; for(let r=a;r<=z;r++) o+=st.rows[r-1].O+st.rows[r-1].L;
+    const t=(z-a+1)*st.perRow;
+    out.push({ a, z, pct: t?o/t:0, o, t });
+  }
+  return out;
+}
+function renderReport(){
+  if(!S.culto) return;
+  const L=S.layout, st=stats(L);
+  $('#rTitulo').textContent = 'Relatório do ' + S.culto.titulo;
+  $('#rData').textContent = fmtData(S.culto.data, S.culto.hora) + (S.culto.status==='Encerrado' ? ' · Encerrado' : ' · Ao vivo');
+  $('#rPres').textContent=st.occ; $('#rLiv').textContent=st.free; $('#rTot').textContent=st.total; $('#rPct').textContent=fmtPct(st.pct);
+  $('#rBar').style.width=(st.pct*100)+'%';
+  $('#rAlas').innerHTML = ['O','L'].map(a=>{
+    const p=st.perAla?st.alas[a]/st.perAla:0;
+    return `<div class="line"><div class="lt"><span>Ala ${ALA[a]} ${st.alas[a]}/${st.perAla}</span><span>${fmtPct(p)}</span></div><div class="pbar"><i style="width:${p*100}%"></i></div></div>`;
+  }).join('');
+  $('#rBands').innerHTML = bands(st,L).map(b=>`<div class="band"><span>F${b.a} a F${b.z} · ${b.pct===1?'lotadas':b.o+'/'+b.t}</span><em>${fmtPct(b.pct)}</em></div>`).join('');
+  $('#rRows').innerHTML = st.rows.map((r,i)=>{ const o=r.O+r.L, p=o/st.perRow; return `<div class="rowstat"><b>F${i+1}</b><div class="pbar"><i style="width:${p*100}%"></i></div><span>${o}/${st.perRow}</span></div>`; }).join('');
+  const rm=$('#rMap'); rm.innerHTML = mapHTML(L, { mini:true });
+  rm.querySelectorAll('.seat').forEach(el=>{ if(isOcc(el.dataset.id)) el.classList.add('o'); });
+  const lider = S.user && S.user.role==='lider';
+  $('#bEncerrar').hidden = !lider;
+  $('#bEncerrar').textContent = S.culto.status==='Encerrado' ? 'Reabrir culto' : 'Encerrar culto';
+  $('#bEncerrar').className = 'btn wide no-print ' + (S.culto.status==='Encerrado' ? '' : 'danger');
+}
+$('#bPdf').addEventListener('click', ()=>{ $('#rRowsBox').open=true; setTimeout(()=>window.print(), 50); });
+$('#bWa').addEventListener('click', ()=>{
+  const L=S.layout, st=stats(L);
+  const txt = [
+    `*${L.igreja || 'Casa Church'} · Relatório do ${S.culto.titulo}*`,
+    fmtData(S.culto.data, S.culto.hora), '',
+    `👥 Presentes: *${st.occ}*`,
+    `🪑 Livres: ${st.free}`,
+    `📊 Total: ${st.total} · Lotação: *${fmtPct(st.pct)}*`, '',
+    '*Por ala*',
+    ...['O','L'].map(a=>`Ala ${ALA[a]}: ${st.alas[a]}/${st.perAla} (${fmtPct(st.perAla?st.alas[a]/st.perAla:0)})`), '',
+    '*Por fileiras*',
+    ...bands(st,L).map(b=>`F${b.a} a F${b.z}: ${fmtPct(b.pct)}`), '',
+    `_Enviado por ${S.user ? S.user.nome : 'obreiro'}_`
+  ].join('\n');
+  window.open('https://wa.me/?text='+encodeURIComponent(txt), '_blank');
+});
+$('#bEncerrar').addEventListener('click', async ()=>{
+  const reabrir = S.culto.status==='Encerrado';
+  if(!reabrir && !confirm('Encerrar o culto? Ninguém mais consegue marcar lugares, e os números ficam guardados na planilha.')) return;
+  try{
+    if(S.pending.size) await flush();
+    const r = await api().encerrar(S.culto.id, reabrir);
+    applyServer(r);
+    toast(reabrir ? 'Culto reaberto.' : 'Culto encerrado. Missão cumprida, equipe!');
+  }catch(err){ toast(err instanceof ApiError ? err.message : 'Sem internet pra encerrar agora.'); }
+});
+window.addEventListener('afterprint', ()=>{ $('#rRowsBox').open=false; });
+
+/* =========================================================
+   INÍCIO
+   ========================================================= */
+autoDetect().finally(()=>{ connLabel(); if(S.user) afterLogin(); else show('login'); });
+
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+})();
+</script>
+</body>
+</html>
